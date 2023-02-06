@@ -23,7 +23,8 @@ public class WebSecurityManager {
 	@Autowired
 	private UserService myUserDetailService;
 
-
+	@Autowired
+	AuthEntryPointJwt unauthorizedHandler;
 
 	// Indicamos que la configuración se hará a travéx del servicio.
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -63,6 +64,8 @@ public class WebSecurityManager {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
 		http.csrf().disable()
+		.exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
+		.and()
 			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 			.and()
 			.authorizeHttpRequests((requests) ->{
