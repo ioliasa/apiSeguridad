@@ -24,7 +24,7 @@ public class Users implements UserDetails {
 	private String user;
 	private String password;
 	private String role;
-	private String virificationCode;
+	private String verificationCode;
 	private boolean enabled;
 	private String email;
 	
@@ -34,7 +34,7 @@ public class Users implements UserDetails {
 		this.user = user;
 		this.password = password;
 		this.role = role;
-		this.virificationCode = virificationCode;
+		this.verificationCode = virificationCode;
 		this.enabled = enabled;
 		this.email = email;
 	}
@@ -67,12 +67,12 @@ public class Users implements UserDetails {
 		this.role = role;
 	}
 
-	public String getVirificationCode() {
-		return virificationCode;
+	public String getVerificationCode() {
+		return verificationCode;
 	}
 
-	public void setVirificationCode(String virificationCode) {
-		this.virificationCode = virificationCode;
+	public void setVerificationCode(String virificationCode) {
+		this.verificationCode = virificationCode;
 	}
 
 	public boolean isEnabled() {
