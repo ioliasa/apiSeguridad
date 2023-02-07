@@ -13,19 +13,27 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.jacaranda.miPrimerApi.service.UserService;
 
 @Configuration
 @EnableWebSecurity
 public class WebSecurityManager {
-	
+
 	@Autowired
 	private UserService myUserDetailService;
 
 	@Autowired
 	AuthEntryPointJwt unauthorizedHandler;
 
+	
+	@Bean
+	public JwtAuthorizationFilter authenticationJwtTokenFilter() {
+		return new JwtAuthorizationFilter();
+	}
+	
+	
 	// Indicamos que la configuración se hará a travéx del servicio.
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.userDetailsService(myUserDetailService);
@@ -52,11 +60,13 @@ public class WebSecurityManager {
 
 		return authProvider;
 	}
-	
+
 	 @Bean
 	  public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
 	    return authConfig.getAuthenticationManager();
 	  }
+
+	
 
 	// Aquí es donde podemos especificar qué es lo que hace y lo que no
 	// según el rol del usuario
@@ -64,18 +74,19 @@ public class WebSecurityManager {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
 		http.csrf().disable()
-		.exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
-		.and()
-			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-			.and()
-			.authorizeHttpRequests((requests) ->{
-				requests
-				.requestMatchers("/signin").permitAll()
-				.anyRequest().denyAll();
-			});
-		
+		        .exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
+		        .and()
+				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+				.authorizeHttpRequests((requests) -> {
+					requests.requestMatchers("/signin").permitAll()
+					.requestMatchers("/element").hasAnyAuthority("ADMIN")
+					.anyRequest().denyAll();
+				});
+
+		http.authenticationProvider(authenticationProvider());
+
+		http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+
 		return http.build();
 	}
 }
-
-
